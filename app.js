@@ -4,6 +4,8 @@ var favicon=require('serve-favicon');
 var logger=require('morgan');
 var bodyParser=require('body-parser');
 
+var auth=require('./routes/auth');
+
 var mongoose=require('mongoose');
 mongoose.connect('mongodb://localhost/hotelbooking').then((data)=>console.log('Successfully connected to mongo')).
 catch((err)=>{

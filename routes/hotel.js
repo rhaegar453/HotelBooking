@@ -7,6 +7,7 @@ var respond=require('../config/respond');
 
 //get all hotels
 router.get('/', (req, res ,next)=>{
+    console.log(req.headers)
     Hotel.find().
     then((hotels)=>{
         return res.json(respond(true, hotels));
