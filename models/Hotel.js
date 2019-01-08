@@ -6,11 +6,20 @@ var hotelSchema=new Schema({
         type:String,
         required:true
     },
-    hotelImages:[String],
     dateCreated:{
         type:Date,
         default:Date.now()
-    }
+    },
+    hostedBy:{
+        type:mongoose.Types.ObjectId,
+        required:true
+    },
+    reviews:[
+        {
+            reviewBy:mongoose.Types.ObjectId,
+            reviewDescription:String
+        }
+    ]
 });
 
 module.exports=mongoose.model('Hotel', hotelSchema);

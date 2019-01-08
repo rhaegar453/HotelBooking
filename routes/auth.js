@@ -28,28 +28,30 @@ router.post('/register', (req, res)=>{
     }
 });
 
-
-router.post('/login', (req, res)=>{
+router.post('/login', function(req, res) {
     User.findOne({
-        email:req.body.email
-    }).then(user=>{
-        if(!user){
-            res.status(401).send(respond(false, 'Authentication failed. User not found'));
-        }
-    }).catch(err=>{
-        user.comparePassword(req.body.password, (err, isMatch)=>{
-            if(isMatch&&!err){
-                var token=jwt.sign(user.toJSON(), settings
-                .secret);
-                return res.json(respond(true, {token:'JWT '+token}));
-            }
-            else{
-                res.status(401).send(respond(false, 'Authentication Failed. Wrong password'));
-            }
-        })
-    })
-});
+      email: req.body.email
+    }, function(err, user) {
+      if (err) throw err;
+  
+      if (!user) {
+        res.status(401).send({success: false, msg: 'Authentication failed. User not found.'});
+      } else {
+        // check if password matches
+        user.comparePassword(req.body.password, function (err, isMatch) {
+          if (isMatch && !err) {
+            // if user is found and password is right create a token
+            var token = jwt.sign(user.toJSON(), settings.secret);
+            // return the information including token as JSON
+            res.json({success: true, token: 'JWT ' + token});
+          } else {
+            res.status(401).send({success: false, msg: 'Authentication failed. Wrong password.'});
+          }
+        });
+      }
+    });
+  });
 
 
 
-module.exports=router;
+module.exports=router

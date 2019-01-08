@@ -6,11 +6,17 @@
     "start": "node ./bin/www"
   },
   "dependencies": {
+    "aws-sdk": "^2.384.0",
     "bcrypt-nodejs": "0.0.3",
     "body-parser": "^1.18.3",
+    "connect-busboy": "0.0.2",
     "cookie-parser": "~1.4.3",
     "debug": "~2.6.9",
     "express": "~4.16.0",
+    "express-fileupload": "^1.1.1-alpha.1",
+    "express-formidable": "^1.2.0",
+    "formidable": "^1.2.1",
+    "fs": "0.0.1-security",
     "http-errors": "~1.6.2",
     "jade": "~1.11.0",
     "jsonwebtoken": "^8.4.0",

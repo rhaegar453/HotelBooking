@@ -3,6 +3,10 @@ var path=require('path');
 var favicon=require('serve-favicon');
 var logger=require('morgan');
 var bodyParser=require('body-parser');
+var formidable=require('express-formidable');
+var fileUpload=require('express-fileupload');
+var fs=require('fs')
+
 
 var auth=require('./routes/auth');
 
@@ -15,14 +19,19 @@ catch((err)=>{
 var Hotel=require('./routes/hotel');
 var app=express();
 
+
+// view engine setup
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'jade');
+
+
 app.use(logger('dev'));
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({'extended':'false'}));
 app.use(express.static(path.join(__dirname, 'build')));
 
-
 app.use('/api/hotel', Hotel);
-
+app.use('/api/auth', auth);
 
 app.use(function(err, req, res, next) {
   res.locals.message = err.message;
