@@ -6,8 +6,11 @@ var Hotel = require('../models/Hotel');
 var respond = require('../config/respond');
 var passport = require('passport');
 require('../config/passport')(passport);
+var settings = require('../config/settings');
+var async=require('async');
 
 
+var jwt = require('jsonwebtoken');
 
 var getToken = (headers) => {
     if (headers && headers.authorization) {
@@ -20,8 +23,24 @@ var getToken = (headers) => {
     }
 }
 
+function getDetails(token) {
+    var value = jwt.verify(token, settings.secret)
+    return {
+        email: value.email,
+        username: value.username,
+        id: value._id
+    };
+}
+
+async function getHotel(id){
+    var details = getDetails(token);
+    return await Hotel.findOne({
+        _id:id
+    });
+}
 
 //get all hotels
+//works
 router.get('/', passport.authenticate('jwt', {
     session: false
 }), (req, res, next) => {
@@ -39,7 +58,8 @@ router.get('/', passport.authenticate('jwt', {
         return res.json(respond(false, 'Unauthorized'));
     }
 });
-//Get all reviews
+//Get all reviews for a hotel
+//Works
 router.get('/review/:id', passport.authenticate('jwt', {
     session: false
 }), (req, res) => {
@@ -58,32 +78,10 @@ router.get('/review/:id', passport.authenticate('jwt', {
 });
 
 
-//post rewiew
-router.post('/review/:id', passport.authenticate('jwt', {
-    session: false
-}), (req, res) => {
-    var token = getToken(req.headers);
-    if (token) {
-        var review = {
-            reviewBy: req.headers.id,
-            reviewDescription: req.body.description
-        }
-        Hotel.update({
-            _id: req.params.id
-        }, 
-        {
-            $push: {
-                reviews: review
-            }
-        }).then(data=>{
-            res.json(respond(true, data));
-        }).catch(err=>{
-            res.json(respond(false, err));
-        });
-    }
-});
 
-//get a hotel
+
+//get details for a particular hotel
+//Works
 router.get('/:id', passport.authenticate('jwt', {
     session: false
 }), (req, res, next) => {
@@ -104,15 +102,23 @@ router.get('/:id', passport.authenticate('jwt', {
 });
 
 
+
 //post a hotel
+//Works 
 router.post('/new', passport.authenticate('jwt', {
     session: false
 }), (req, res, next) => {
     var token = getToken(req.headers);
+    var userDetails = getDetails(token);
     if (token) {
-        Hotel.create(req.body).then(data => {
-            console.log(data);
-            return res.json(respond(true, data));
+
+        var hotel = new Hotel({
+            hotelName: req.body.hotelName,
+            hostedBy: userDetails.id
+        });
+
+        hotel.save().then(data => {
+            return res.json(respond(true, data))
         }).catch(err => {
             return res.json(respond(false, err));
         });
@@ -121,22 +127,30 @@ router.post('/new', passport.authenticate('jwt', {
     }
 });
 
+
+//Works
 router.delete('/:id', passport.authenticate('jwt', {
     session: false
 }), (req, res, next) => {
     var token = getToken(req.headers);
-    console.log(token);
+    var details=getDetails(token);
+    // return res.json(details);
     if (token) {
         Hotel.deleteOne({
             _id: req.params.id
         }).then((data) => {
-            return res.json(respond(true, data));
+            return res.json(respond(true, "Deleted Hotel Successfully"));
         }).catch(err => {
             return res.json(respond(false, err));
         });
     } else {
         return res.json(respond(false, 'Unauthorized'));
     }
+
+    var details= getDetails(token);
+    
+    return res.json(getHotel(req.params.id));
+
 });
 
 //edit a hotel

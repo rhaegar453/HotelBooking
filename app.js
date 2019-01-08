@@ -6,7 +6,7 @@ var bodyParser=require('body-parser');
 var formidable=require('express-formidable');
 var fileUpload=require('express-fileupload');
 var fs=require('fs')
-
+var orders=require('./routes/orders');
 
 var auth=require('./routes/auth');
 
@@ -32,6 +32,8 @@ app.use(express.static(path.join(__dirname, 'build')));
 
 app.use('/api/hotel', Hotel);
 app.use('/api/auth', auth);
+app.use('/api/orders', orders);
+
 
 app.use(function(err, req, res, next) {
   res.locals.message = err.message;
